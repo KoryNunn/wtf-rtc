@@ -10,7 +10,7 @@ Log of the issues I've come across in [NOTES.md](NOTES.md)
 
 ## Usage
 
-```
+```js
 var wtfRtc = require('wtf-rtc');
 
 // wtfRtc("myChannel", options) where 'options' is https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#RTCConfiguration_dictionary
