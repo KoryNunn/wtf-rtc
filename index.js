@@ -3,13 +3,21 @@ var righto = require('righto');
 module.exports = function(channelLabel, config, callback){
   function getConnectionInState(peerConnection, state, callback){
     var ready = righto(done => {
+      var error;
       function onChange(){
-        if(peerConnection.signalingState === state){
+        if(peerConnection.signalingState === state || error){
           peerConnection.removeEventListener('signalingstatechange ', onChange);
+          clearInterval(interval);
+          clearTimeout(timeout);
           done();
         }
       }
       peerConnection.addEventListener('signalingstatechange ', onChange);
+      var interval = setInterval(onChange, 10);
+      var timeout = setTimeout(function(){
+        error = new Error('Timedout getting appropriate signaling state');
+        onChange();
+      }, 5000);
       onChange();
     });
 
@@ -19,8 +27,13 @@ module.exports = function(channelLabel, config, callback){
   function getSdp(peerConnection, offerOrAnser, callback){
     var localDescriptionSet = righto.sync(peerConnection.setLocalDescription.bind(peerConnection), offerOrAnser);
     var sdp = righto(done => {
+      var timeout = setTimeout(function(){
+        return done(null, peerConnection.localDescription.sdp);
+      }, 1000);
+
       peerConnection.addEventListener('icecandidate', ({ candidate }) => {
         if (!candidate) {
+          clearTimeout(timeout);
           done(null, peerConnection.localDescription.sdp);
         }
       })
@@ -33,13 +46,10 @@ module.exports = function(channelLabel, config, callback){
     var peerConnection = new RTCPeerConnection(config);
     var stable = righto(getConnectionInState, peerConnection, 'stable');
 
-    var dataChannel = peerConnection.createDataChannel(channelLabel, {
-      ordered: false
-    });
-    var openCallbacks = [];
-
     var getOpenDataChannel = righto(callback => {
-      dataChannel.addEventListener('open', () => callback(null, dataChannel));
+      peerConnection.addEventListener('datachannel', (event) => {
+        callback(null, event.channel)
+      });
     });
 
     var remoteDescriptionSet = stable.get(() => peerConnection.setRemoteDescription({ type: "offer", sdp: offerText }));
@@ -50,13 +60,11 @@ module.exports = function(channelLabel, config, callback){
     result(callback)
   };
 
-  function createOffer(callback) {
+  function createOffer(dataChannelOptions, callback) {
     var peerConnection = new RTCPeerConnection(config);
     var stable = righto(getConnectionInState, peerConnection, 'stable');
 
-    var dataChannel = peerConnection.createDataChannel(channelLabel, {
-      ordered: false
-    });
+    var dataChannel = peerConnection.createDataChannel(channelLabel, dataChannelOptions);
 
     var getOpenDataChannel = righto(callback => {
       var interval = setInterval(() => {
@@ -64,7 +72,7 @@ module.exports = function(channelLabel, config, callback){
           clearInterval(interval);
           callback(null, dataChannel);
         }
-      });
+      }, 10);
     });
 
     function answer(answerText, callback) {

@@ -66,7 +66,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
     offerButton.addEventListener('click', function(){
         reset();
-        rtc.createOffer(function(error, offerResult){
+        rtc.createOffer({ ordered: false }, function(error, offerResult){
             if(error){
                 reset();
                 offerDisplay = createTextarea();
@@ -91,7 +91,7 @@ window.addEventListener('DOMContentLoaded', function(){
                     }
                     startChat(answerResult);
                 });
-                
+
                 reset();
             });
         });

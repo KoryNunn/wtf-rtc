@@ -11,3 +11,7 @@ Sometimes if you do the right thing it will do absolutely nothing.
 the 'onicecandidate' event triggeres for three different reasons with three different results and you only care when the event.candidate is null
 
 If you have gone down one flow with an instance of WebRTC but you want to go down another, you can't. just throw it out and start again.
+
+Oooh nice sometimes peerConnection.addEventListener('icecandidate' just never changes so you have to be all like "Well I guess it's done then!" and just use what you've got.
+
+If you try and connect to yourself within about 5 seconds it will absolutely fail sometimes.
