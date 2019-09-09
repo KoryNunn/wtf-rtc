@@ -1,0 +1,22 @@
+{
+  "name": "wtf-rtc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "watch": "watchify -d ./example/index.js -o ./example/index.browser.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "righto": "^6.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.0",
+    "crel": "^4.0.1",
+    "watchify": "^3.11.1"
+  }
+}
