@@ -6,9 +6,11 @@ In reality WebRTC seems pretty bad in general so YMMV.
 
 Log of the issues I've come across in [NOTES.md](NOTES.md)
 
+[Example](https://korynunn.github.io/wtf-rtc/example/index.html)
+
 ## Usage
 
-```
+```js
 var wtfRtc = require('wtf-rtc');
 
 // wtfRtc("myChannel", options) where 'options' is https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#RTCConfiguration_dictionary
