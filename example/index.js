@@ -27,8 +27,11 @@ window.addEventListener('DOMContentLoaded', function(){
         chatInput && chatInput.remove();
     }
 
-    function createTextarea(){
-        var input = crel('textarea')
+    function createTextarea(readOnly){
+        var input = crel('textarea', {
+            class: readOnly ? 'read' : 'write',
+            placeholder: readOnly ? '' : 'Paste big string (sdp) from the other peer here'
+        })
         document.body.appendChild(input);
         return input;
     }
@@ -50,7 +53,6 @@ window.addEventListener('DOMContentLoaded', function(){
                     return
                 }
                 event.preventDefault();
-                chatInput.removeEventListener('keypress', submit);
                 dataChannel.send(chatInput.value);
                 chatOutput.appendChild(crel('div', 'You:' + chatInput.value));
                 chatInput.value = '';
@@ -69,11 +71,11 @@ window.addEventListener('DOMContentLoaded', function(){
         rtc.createOffer({ ordered: false }, function(error, offerResult){
             if(error){
                 reset();
-                offerDisplay = createTextarea();
+                offerDisplay = createTextarea(true);
                 offerDisplay.value = error.message;
                 return;
             }
-            offerDisplay = createTextarea();
+            offerDisplay = createTextarea(true);
             offerDisplay.value = offerResult.sdp;
             offerInput = createTextarea();
             offerInput.addEventListener('keypress', function(event){
@@ -85,7 +87,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
                 offerResult.answer(offerInput.value, function(error, answerResult){
                     if(error){
-                        offerDisplay = createTextarea();
+                        offerDisplay = createTextarea(true);
                         offerDisplay.value = error.message;
                         return;
                     }
@@ -110,12 +112,12 @@ window.addEventListener('DOMContentLoaded', function(){
             rtc.consumeOffer(offerInput.value, function(error, consumeResult){
                 if(error){
                     reset();
-                    offerDisplay = createTextarea();
+                    offerDisplay = createTextarea(true);
                     offerDisplay.value = error.message;
                     document.body.appendChild(offerDisplay);
                     return;
                 }
-                offerDisplay = createTextarea();
+                offerDisplay = createTextarea(true);
                 offerDisplay.value = consumeResult.sdp;
                 startChat(consumeResult);
             });
