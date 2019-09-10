@@ -53,7 +53,6 @@ window.addEventListener('DOMContentLoaded', function(){
                     return
                 }
                 event.preventDefault();
-                chatInput.removeEventListener('keypress', submit);
                 dataChannel.send(chatInput.value);
                 chatOutput.appendChild(crel('div', 'You:' + chatInput.value));
                 chatInput.value = '';
