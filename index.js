@@ -27,12 +27,16 @@ module.exports = function(channelLabel, config, callback){
   function getSdp(peerConnection, offerOrAnser, callback){
     var localDescriptionSet = righto.sync(peerConnection.setLocalDescription.bind(peerConnection), offerOrAnser);
     var sdp = righto(done => {
+      if(peerConnection.iceGatheringState === 'complete'){
+          return done(null, peerConnection.localDescription.sdp);
+      }
+
       var timeout = setTimeout(function(){
         return done(null, peerConnection.localDescription.sdp);
-      }, 1000);
+      }, 5000);
 
       peerConnection.addEventListener('icecandidate', ({ candidate }) => {
-        if (!candidate) {
+        if (candidate == null) {
           clearTimeout(timeout);
           done(null, peerConnection.localDescription.sdp);
         }
@@ -53,7 +57,7 @@ module.exports = function(channelLabel, config, callback){
     });
 
     var remoteDescriptionSet = stable.get(() => peerConnection.setRemoteDescription({ type: "offer", sdp: offerText }));
-    var answer = remoteDescriptionSet.get(() => peerConnection.createAnswer());
+    var answer = remoteDescriptionSet.get(() => peerConnection.createAnswer())
     var sdp = righto(getSdp, peerConnection, answer);
     var result = sdp.get(sdp => ({ sdp, getOpenDataChannel }));
 
